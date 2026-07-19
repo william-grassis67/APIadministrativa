@@ -1,0 +1,36 @@
+services:
+  - type: web
+    name: demo-api
+    runtime: docker
+    region: ohio  # Mude para a região mais próxima se necessário
+    
+    # Variáveis de Ambiente
+    envVars:
+      - key: SPRING_PROFILES_ACTIVE
+        value: prod
+      - key: JWT_SECRET
+        sync: false
+      - key: DATABASE_URL
+        sync: false
+      - key: DATABASE_USER
+        sync: false
+      - key: DATABASE_PASSWORD
+        sync: false
+    
+    # Build
+    dockerfilePath: ./Dockerfile
+    
+    # Health Check
+    healthCheckPath: /actuator/health
+    
+    # Auto-deploy
+    autoDeploy: true
+    
+    # Recursos
+    plan: starter  # Você pode ajustar: starter, standard, pro, etc.
+    
+    # Variáveis de Ambiente secretas (configure no Dashboard do Render)
+    # DATABASE_URL: jdbc:mysql://seu-host:3306/seu-db?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+    # DATABASE_USER: seu-usuario
+    # DATABASE_PASSWORD: sua-senha
+    # JWT_SECRET: sua-chave-secreta
