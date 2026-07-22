@@ -1,11 +1,13 @@
 package com.example.demo.service;
 
 import com.example.demo.dto.UsuarioDTO;
-import com.example.demo.entity.Pagamento;
+import com.example.demo.entity.GuiasInss;
+//import com.example.demo.entity.Pagamento;
 import com.example.demo.entity.Usuario;
 import com.example.demo.exception.CampoInvalidoexception;
 import com.example.demo.repository.ClienteRepository;
-import com.example.demo.repository.PagamentoRepository;
+import com.example.demo.repository.GuiasInssRepository;
+//import com.example.demo.repository.PagamentoRepository;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
@@ -16,246 +18,145 @@ import java.util.Objects;
 @Service
 public class AdminService {
 
-    private final ClienteRepository clienteRepository;
-    private final PagamentoRepository pagamentoRepository;
-    private final PagamentoService pagamentoService;
+        private final ClienteRepository clienteRepository;
+        private final GuiasInssRepository guiasInssRepository;
 
-    public AdminService(
-            ClienteRepository clienteRepository,
-            PagamentoRepository pagamentoRepository,
-            PagamentoService pagamentoService
-    ) {
-        this.clienteRepository = clienteRepository;
-        this.pagamentoRepository = pagamentoRepository;
-        this.pagamentoService = pagamentoService;
-    }
-
-
-    // CRIA ADMIN PADRÃO APÓS O SISTEMA INICIAR
-    @EventListener(ApplicationReadyEvent.class)
-    public void criarAdmin() {
-
-        if (clienteRepository.findByTipo(Usuario.TipoUsuario.ADMIN).isEmpty()) {
-
-            Usuario admin = new Usuario();
-
-            admin.setNome("Administrador");
-            admin.setEmail("admin@empresa.com");
-            admin.setEndereco("Sistema");
-            admin.setCpf("00000000000");
-
-            // Futuramente trocar por BCrypt
-            admin.setSenha("123456");
-
-            admin.setTipo(Usuario.TipoUsuario.ADMIN);
-
-            clienteRepository.save(admin);
-
-            System.out.println("Administrador padrão criado!");
-        }
-    }
-
-
-    // CADASTRAR CLIENTE
-    public UsuarioDTO registerUser(
-            String nome,
-            String email,
-            String endereco,
-            String cpf,
-            String senha
-    ) {
-
-        if (clienteRepository.findByEmail(email).isPresent()) {
-            throw new CampoInvalidoexception(
-                    "Email já cadastrado!"
-            );
+        public AdminService(
+                        ClienteRepository clienteRepository,
+                        // PagamentoRepository pagamentoRepository,
+                        // PagamentoService pagamentoService,
+                        GuiasInssRepository guiasInssRepository) {
+                this.clienteRepository = clienteRepository;
+                // this.pagamentoRepository = pagamentoRepository;
+                // this.pagamentoService = pagamentoService;
+                this.guiasInssRepository = guiasInssRepository;
         }
 
-        if (clienteRepository.findByCpf(cpf).isPresent()) {
-            throw new CampoInvalidoexception(
-                    "CPF já cadastrado!"
-            );
+        // CADASTRAR CLIENTE
+        public UsuarioDTO registerUser(
+                        String nome,
+                        String email,
+                        String endereco,
+                        String cpf,
+                        String senha,
+                        Integer numeroTelefone) {
+
+                if (clienteRepository.findByEmail(email).isPresent()) {
+                        throw new CampoInvalidoexception(
+                                        "Email já cadastrado!");
+                }
+
+                if (clienteRepository.findByCpf(cpf).isPresent()) {
+                        throw new CampoInvalidoexception(
+                                        "CPF já cadastrado!");
+                }
+
+                Usuario usuario = new Usuario();
+
+                if (usuario.getNumeroTelefone() != 11) {
+                        throw new CampoInvalidoexception("O numero precisa ter exatamente 11 digitos");
+                }
+
+                usuario.setNome(nome);
+                usuario.setEmail(email);
+                usuario.setEndereco(endereco);
+                usuario.setCpf(cpf);
+                usuario.setSenha(senha);
+                usuario.setNumeroTelefone(numeroTelefone);
+
+                // Cadastro realizado pelo admin sempre cria cliente
+                usuario.setTipo(Usuario.TipoUsuario.CLIENTE);
+
+                Usuario usuarioSalvo = clienteRepository.save(usuario);
+
+                return new UsuarioDTO(
+                                usuarioSalvo.getId(),
+                                usuarioSalvo.getNome(),
+                                usuarioSalvo.getEmail(),
+                                usuarioSalvo.getEndereco(),
+                                usuarioSalvo.getCpf(),
+                                usuarioSalvo.getNumeroTelefone());
         }
 
+        // DELETAR USUÁRIO PELO CPF
+        public void removeUser(String cpf) {
 
-        Usuario usuario = new Usuario();
+                Usuario usuario = clienteRepository.findByCpf(cpf)
+                                .orElseThrow(() -> new CampoInvalidoexception(
+                                                "Usuário não encontrado!"));
 
-        usuario.setNome(nome);
-        usuario.setEmail(email);
-        usuario.setEndereco(endereco);
-        usuario.setCpf(cpf);
-        usuario.setSenha(senha);
-
-        // Cadastro realizado pelo admin sempre cria cliente
-        usuario.setTipo(Usuario.TipoUsuario.CLIENTE);
-
-
-        Usuario usuarioSalvo = clienteRepository.save(usuario);
-
-
-        return new UsuarioDTO(
-                usuarioSalvo.getId(),
-                usuarioSalvo.getNome(),
-                usuarioSalvo.getEmail(),
-                usuarioSalvo.getEndereco(),
-                usuarioSalvo.getCpf()
-        );
-    }
-
-
-
-    // DELETAR USUÁRIO PELO CPF
-    public void removeUser(String cpf) {
-
-        Usuario usuario = clienteRepository.findByCpf(cpf)
-                .orElseThrow(() ->
-                        new CampoInvalidoexception(
-                                "Usuário não encontrado!"
-                        )
-                );
-
-
-        clienteRepository.deleteById(
-                Objects.requireNonNull(
-                        usuario.getId(),
-                        "ID do usuário é obrigatório"
-                )
-        );
-    }
-
-
-
-    // LISTAR TODOS OS USUÁRIOS
-    public List<Usuario> listUsers() {
-
-        List<Usuario> usuarios = clienteRepository.findAll();
-
-        usuarios.forEach(this::preencherDadosPagamento);
-
-        return usuarios;
-    }
-
-
-
-    // VALIDAR ACESSO ADMIN
-    public void validarAcessoAdministrador(String cpf) {
-
-        Usuario usuario = clienteRepository.findByCpf(cpf)
-                .orElseThrow(() ->
-                        new CampoInvalidoexception(
-                                "Usuário não encontrado!"
-                        )
-                );
-
-
-        if (usuario.getTipo() != Usuario.TipoUsuario.ADMIN) {
-
-            throw new CampoInvalidoexception(
-                    "Acesso restrito a administradores."
-            );
+                clienteRepository.deleteById(
+                                Objects.requireNonNull(
+                                                usuario.getId(),
+                                                "ID do usuário é obrigatório"));
         }
 
+        // LISTAR TODOS OS USUÁRIOS
+        public List<Usuario> listUsers() {
 
-        if (!pagamentoService.isPagamentoPago(usuario)) {
-
-            throw new CampoInvalidoexception(
-                    "Pagamento pendente. Acesso bloqueado até a confirmação do pagamento."
-            );
+                List<Usuario> usuarios = clienteRepository.findAll();
+                return usuarios;
         }
-    }
 
+        // VALIDAR ACESSO ADMIN
+        public void validarAcessoAdministrador(String cpf) {
 
+                Usuario usuario = clienteRepository.findByCpf(cpf)
+                                .orElseThrow(() -> new CampoInvalidoexception(
+                                                "Usuário não encontrado!"));
 
-    // LISTAR SOMENTE CLIENTES
-    public List<Usuario> listClientes() {
+                if (usuario.getTipo() != Usuario.TipoUsuario.ADMIN) {
 
-        List<Usuario> usuarios =
-                clienteRepository.findByTipo(
-                        Usuario.TipoUsuario.CLIENTE
-                );
+                        throw new CampoInvalidoexception(
+                                        "Acesso restrito a administradores.");
+                }
+        }
 
+        // LISTAR SOMENTE CLIENTES
+        public List<Usuario> listClientes() {
+                return clienteRepository.findAll();
+        }
 
-        usuarios.forEach(this::preencherDadosPagamento);
+        // BUSCAR USUÁRIO PELO EMAIL
+        public Usuario buscarPorEmail(String email) {
 
-        return usuarios;
-    }
+                Usuario usuario = clienteRepository.findByEmail(email)
+                                .orElseThrow(() -> new CampoInvalidoexception(
+                                                "Usuário não encontrado!"));
 
+                return usuario;
+        }
 
+        // LISTAR PAGAMENTOS
+        public List<GuiasInss> listarPagamentos() {
 
-    // ADICIONA INFORMAÇÕES DE PAGAMENTO NO USUÁRIO
-    private void preencherDadosPagamento(Usuario usuario) {
+                return guiasInssRepository.findAll();
+        }
 
-        Pagamento pagamento =
-                pagamentoService.buscarUltimoPagamento(usuario);
+        // BUSCAR PAGAMENTO PELO ID
+        public GuiasInss buscarPagamentoPorId(Integer id) {
 
+                return guiasInssRepository.findById(
+                                Objects.requireNonNull(
+                                                id,
+                                                "ID do pagamento é obrigatório"))
+                                .orElseThrow(() -> new CampoInvalidoexception(
+                                                "Pagamento não encontrado!"));
+        }
 
-        boolean pago =
-                pagamento != null && pagamento.isPago();
+        // PEGAR GUIA DO Usuario
+        public GuiasInss findByGuia(Integer id) {
 
+                return guiasInssRepository.findById(id)
+                                .orElseThrow(() -> new RuntimeException("Guia não encontrada"));
 
-        usuario.setPagamentoPago(pago);
+        }
 
-        usuario.setStatusPagamento(
-                pago ? "PAGO" : "PENDENTE"
-        );
+        // BUSCAR ÚLTIMO PAGAMENTO
+        public GuiasInss lastPayments(Usuario usuario) {
 
-
-        usuario.setDataPagamento(
-                pagamento != null
-                        ? pagamento.getDataPagamento()
-                        : null
-        );
-
-
-        usuario.setMensagemPagamento(
-                pago
-                        ? "Pagamento confirmado."
-                        : "Pagamento pendente"
-        );
-    }
-
-
-
-    // BUSCAR USUÁRIO PELO EMAIL
-    public Usuario buscarPorEmail(String email) {
-
-        Usuario usuario =
-                clienteRepository.findByEmail(email)
-                        .orElseThrow(() ->
-                                new CampoInvalidoexception(
-                                        "Usuário não encontrado!"
-                                )
-                        );
-
-
-        preencherDadosPagamento(usuario);
-
-        return usuario;
-    }
-
-
-
-    // LISTAR PAGAMENTOS
-    public List<Pagamento> listarPagamentos() {
-
-        return pagamentoRepository.findAll();
-    }
-
-
-
-    // BUSCAR PAGAMENTO PELO ID
-    public Pagamento buscarPagamentoPorId(Integer id) {
-
-        return pagamentoRepository.findById(
-                Objects.requireNonNull(
-                        id,
-                        "ID do pagamento é obrigatório"
-                )
-        )
-        .orElseThrow(() ->
-                new CampoInvalidoexception(
-                        "Pagamento não encontrado!"
-                )
-        );
-    }
+                return guiasInssRepository
+                                .findTopByUsuarioOrderByDatapagamentoDesc(usuario)
+                                .orElseThrow(() -> new RuntimeException("Nenhum pagamento encontrado"));
+        }
 }

@@ -12,11 +12,34 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
         http
-                .csrf(csrf -> csrf.disable())
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/register", "/api/login").permitAll()
-                        .anyRequest().permitAll()
-                );
+            .csrf(csrf -> csrf.disable())
+
+            .authorizeHttpRequests(auth -> auth
+
+                // Rotas públicas
+                .requestMatchers(
+                    "/api/register",
+                    "/api/login"
+                ).permitAll()
+
+
+                // Rotas somente ADMIN
+                .requestMatchers(
+                    "/api/admin/**",
+                    "/api/usuarios/**"
+                ).hasRole("ADMIN")
+
+
+                // Rotas CLIENTE e ADMIN
+                .requestMatchers(
+                    "/api/guias/**",
+                    "/api/pagamentos/**"
+                ).hasAnyRole("ADMIN", "CLIENTE")
+
+
+                // qualquer outra rota precisa estar autenticada
+                .anyRequest().authenticated()
+            );
 
         return http.build();
     }

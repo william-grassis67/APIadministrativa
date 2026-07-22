@@ -1,10 +1,13 @@
 package com.example.demo.service;
 
 import com.example.demo.dto.LoginDTO;
-import com.example.demo.entity.Pagamento;
+import com.example.demo.entity.GuiasInss;
+//import com.example.demo.entity.Pagamento;
 import com.example.demo.entity.Usuario;
 import com.example.demo.exception.CampoInvalidoexception;
 import com.example.demo.repository.ClienteRepository;
+import com.example.demo.repository.GuiasInssRepository;
+
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -15,12 +18,13 @@ public class LoginService {
 
     private final ClienteRepository clienteRepository;
     private final JwtService jwtService;
-    private final PagamentoService pagamentoService;
+    //private final PagamentoService pagamentoService;
+    private final GuiasInssRepository guiasInssRepository;
 
-    public LoginService(ClienteRepository clienteRepository, JwtService jwtService, PagamentoService pagamentoService) {
+    public LoginService(ClienteRepository clienteRepository, JwtService jwtService, GuiasInssRepository guiasInssRepository) {
         this.clienteRepository = clienteRepository;
         this.jwtService = jwtService;
-        this.pagamentoService = pagamentoService;
+        this.guiasInssRepository = guiasInssRepository;
     }
 
     Date date = new Date();
@@ -56,26 +60,27 @@ public class LoginService {
         usuario.setUltimoAcesso(LocalDateTime.now());
         clienteRepository.save(usuario);
 
-        Pagamento pagamento = pagamentoService.buscarUltimoPagamento(usuario);
-        boolean pagamentoPago = pagamentoService.isPagamentoPago(usuario);
-        String statusPagamento = pagamentoService.getStatusPagamento(usuario);
-        LocalDateTime dataPagamento = pagamento != null ? pagamento.getDataPagamento() : null;
-        String mensagemPagamento = pagamentoPago ? "Pagamento confirmado." : "Pagamento pendente";
-        boolean acessoLiberado = pagamentoPago || usuario.getTipo() != Usuario.TipoUsuario.ADMIN;
-
+        //Pagamento pagamento = pagamentoService.buscarUltimoPagamento(usuario);
+        //boolean pagamentoPago = pagamentoService.isPagamentoPago(usuario);
+        //String statusPagamento = pagamentoService.getStatusPagamento(usuario);
+        //LocalDateTime dataPagamento = pagamento != null ? pagamento.getDataPagamento() : null;
+        //String mensagemPagamento = pagamentoPago ? "Pagamento confirmado." : "Pagamento pendente";
+        //boolean acessoLiberado = pagamentoPago || usuario.getTipo() != Usuario.TipoUsuario.ADMIN;
         return new LoginDTO(
-                usuario.getCpf(),
-                usuario.getNome(),
-                usuario.getEmail(),
-                usuario.getTipo(),
-                usuario.getUltimoAcesso(),
-                pagamentoPago,
-                statusPagamento,
-                dataPagamento,
-                mensagemPagamento,
-                acessoLiberado,
-                token
-        );
+        usuario.getCpf(),
+        usuario.getNome(),
+        usuario.getEmail(),
+        usuario.getTipo(),
+        usuario.getUltimoAcesso(),
+        usuario.getGuiasInsses(),
+        usuario.getMensagemPagamento(),
+        usuario.getNumeroTelefone(),
+        usuario.isPagamentoPago(),
+        usuario.getStatusPagamento(),
+        usuario.getDataPagamento(),
+        true,
+        token
+);
     }
 }
 

@@ -11,6 +11,7 @@ public class UsuarioDTO {
     private String cpf;
     private String senha;
     private Usuario.TipoUsuario tipo;
+    private Integer numeroTelefone;
 
 
     public UsuarioDTO() {
@@ -22,13 +23,15 @@ public class UsuarioDTO {
             String nome,
             String email,
             String endereco,
-            String cpf
+            String cpf,
+            Integer numeroTelefone
     ) {
         this.id = id;
         this.nome = nome;
         this.email = email;
         this.endereco = endereco;
         this.cpf = cpf;
+        this.numeroTelefone = numeroTelefone;
     }
 
 
@@ -115,5 +118,13 @@ public class UsuarioDTO {
 
     public void setSenha(String senha) {
         this.senha = senha;
+    }
+
+    public Integer getNumeroTelefone(){
+        return this.numeroTelefone;
+    }
+
+    public void setNumeroTelefone(Integer numeroTelefone){
+        this.numeroTelefone = numeroTelefone;
     }
 }

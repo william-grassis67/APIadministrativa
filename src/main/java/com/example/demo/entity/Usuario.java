@@ -1,6 +1,8 @@
 package com.example.demo.entity;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 import jakarta.persistence.*;
 
@@ -30,6 +32,9 @@ public class Usuario {
     @Column(name = "ultimoacesso")
     private LocalDateTime ultimoAcesso;
 
+    @Column (name = "numeroTelefone")
+    private Integer numeroTelefone;
+
     @Transient
     private boolean pagamentoPago;
 
@@ -41,6 +46,9 @@ public class Usuario {
 
     @Transient
     private String mensagemPagamento;
+
+    @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL)
+    private List<GuiasInss> pagamentos = new ArrayList<>();
 
     public enum TipoUsuario {
         ADMIN,
@@ -62,7 +70,9 @@ public class Usuario {
             String cpf,
             String senha,
             TipoUsuario tipo,
-            LocalDateTime ultimoAcesso
+            LocalDateTime ultimoAcessom,
+            Integer numeroTelefone
+
     ) {
         this.id = id;
         this.nome = nome;
@@ -72,6 +82,7 @@ public class Usuario {
         this.senha = senha;
         this.tipo = tipo;
         this.ultimoAcesso = ultimoAcesso;
+        this.numeroTelefone = numeroTelefone;
     }
 
     public Integer getId() {
@@ -168,5 +179,21 @@ public class Usuario {
 
     public void setMensagemPagamento(String mensagemPagamento) {
         this.mensagemPagamento = mensagemPagamento;
+    }
+
+    public List<GuiasInss> getGuiasInsses() {
+        return this.pagamentos;
+    }
+
+    public void setGuiasInss(List<GuiasInss> pagamentos) {
+        this.pagamentos = pagamentos;
+    }
+
+    public Integer getNumeroTelefone(){
+        return this.numeroTelefone;
+    }
+
+    public void setNumeroTelefone(Integer numeroTelefone){
+        this.numeroTelefone = numeroTelefone;
     }
 }
