@@ -9,29 +9,132 @@ import com.example.demo.entity.Usuario;
 import com.example.demo.repository.ClienteRepository;
 import com.example.demo.repository.GuiasInssRepository;
 
+
 @Service
 public class UsuarioService {
-    private final GuiasInssRepository pagamGuiasInss;
+
+
+    private final GuiasInssRepository guiasInssRepository;
     private final ClienteRepository clienteRepository;
-    
-    public UsuarioService(GuiasInssRepository pagamGuiasInss, ClienteRepository clienteRepository){
-        this.pagamGuiasInss = pagamGuiasInss;
+
+
+
+    public UsuarioService(
+            GuiasInssRepository guiasInssRepository,
+            ClienteRepository clienteRepository
+    ) {
+
+        this.guiasInssRepository = guiasInssRepository;
         this.clienteRepository = clienteRepository;
+
     }
 
-    //PAGAR GUIA DO GuiasInss
-    public GuiasInss paymentRegister(Integer usuarioId,GuiasInss guiasInss){
+
+
+    /**
+     * Criar nova guia INSS
+     */
+    public GuiasInss criarGuia(
+            Integer usuarioId,
+            GuiasInss guiaInss
+    ) {
+
+
         Usuario usuario = clienteRepository.findById(usuarioId)
-            .orElseThrow(() -> new RuntimeException("Usuario não encontrado"));
 
-            guiasInss.setUsuario(usuario);
-            //guiasInss.setId(usuario.getId());
-            //guiasInss.setCpf(usuario.getCpf());
-            guiasInss.setDataPagamento(LocalDateTime.now());
-            //guiasInss.setValor(guiasInss.getValor());
-            
-            
+                .orElseThrow(() ->
+                        new RuntimeException(
+                                "Usuário não encontrado"
+                        )
+                );
 
-            return guiasInss;
+
+
+        if (guiaInss.getCompetencia() == null ||
+            guiaInss.getCompetencia().isBlank()) {
+
+            throw new RuntimeException(
+                    "Competência obrigatória"
+            );
+
+        }
+
+
+
+        if (guiaInss.getValor() == null ||
+            guiaInss.getValor() <= 0) {
+
+            throw new RuntimeException(
+                    "Valor inválido"
+            );
+
+        }
+
+
+
+        // Vincula usuário
+        guiaInss.setUsuario(usuario);
+
+
+
+        // Nova guia começa pendente
+        guiaInss.setPaga(false);
+
+
+
+        // Ainda não foi paga
+        guiaInss.setDataPagamento(null);
+
+
+
+        return guiasInssRepository.save(guiaInss);
+
     }
+
+
+
+
+
+    /**
+     * Confirmar pagamento de uma guia
+     */
+    public GuiasInss confirmarPagamento(
+            Integer guiaId
+    ) {
+
+
+        GuiasInss guia =
+                guiasInssRepository.findById(guiaId)
+
+                .orElseThrow(() ->
+                        new RuntimeException(
+                                "Guia não encontrada"
+                        )
+                );
+
+
+
+        if (guia.isPaga()) {
+
+            throw new RuntimeException(
+                    "Esta guia já foi paga"
+            );
+
+        }
+
+
+
+        guia.setPaga(true);
+
+
+        guia.setDataPagamento(
+                LocalDateTime.now()
+        );
+
+
+
+        return guiasInssRepository.save(guia);
+
+    }
+
 }

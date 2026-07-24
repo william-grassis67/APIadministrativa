@@ -3,6 +3,8 @@ package com.example.demo.entity;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.*;
 
 @Entity
@@ -28,20 +30,22 @@ public class GuiasInss {
     private boolean pago = false;
 
 
-    private LocalDateTime datapagamento;
+    @Column(name = "data_pagamento")
+    private LocalDateTime dataPagamento;
 
 
     @Column(length = 255)
     private String mensagemPagamento;
 
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "usuario_id", nullable = false)
+    @JsonIgnore
     private Usuario usuario;
 
 
 
-    // Obrigatório para o JPA
+    // Construtor obrigatório do JPA
     public GuiasInss() {
 
     }
@@ -54,7 +58,7 @@ public class GuiasInss {
             LocalDate vencimento,
             Double valor,
             boolean pago,
-            LocalDateTime datapagamento,
+            LocalDateTime dataPagamento,
             String mensagemPagamento
     ) {
         this.id = id;
@@ -62,7 +66,7 @@ public class GuiasInss {
         this.vencimento = vencimento;
         this.valor = valor;
         this.pago = pago;
-        this.datapagamento = datapagamento;
+        this.dataPagamento = dataPagamento;
         this.mensagemPagamento = mensagemPagamento;
     }
 
@@ -124,12 +128,12 @@ public class GuiasInss {
 
 
     public LocalDateTime getDataPagamento() {
-        return datapagamento;
+        return dataPagamento;
     }
 
 
-    public void setDataPagamento(LocalDateTime datapagamento) {
-        this.datapagamento = datapagamento;
+    public void setDataPagamento(LocalDateTime dataPagamento) {
+        this.dataPagamento = dataPagamento;
     }
 
 

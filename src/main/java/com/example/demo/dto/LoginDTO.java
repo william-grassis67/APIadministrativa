@@ -14,17 +14,18 @@ public class LoginDTO {
 
 
     // Dados do usuário
+    private Integer id;
     private String nome;
     private String email;
     private Usuario.TipoUsuario tipo;
     private LocalDateTime ultimoAcesso;
 
 
-    // Guias do INSS
+    // Guias INSS
     private List<GuiasInss> guiasInss;
 
 
-    // Informações de pagamento
+    // Pagamento
     private String mensagemPagamento;
     private boolean pagamentoPago;
     private String statusPagamento;
@@ -32,28 +33,22 @@ public class LoginDTO {
 
 
     // Outros dados
-    private Integer numeroTelefone;
+    private String numeroTelefone;
 
     private boolean acessoLiberado;
 
     private String token;
 
 
-
     public LoginDTO() {
     }
 
 
-
     // Login recebido pelo frontend
-    public LoginDTO(
-            String cpf,
-            String senha
-    ) {
+    public LoginDTO(String cpf, String senha) {
         this.cpf = cpf;
         this.senha = senha;
     }
-
 
 
 
@@ -66,12 +61,13 @@ public class LoginDTO {
             LocalDateTime ultimoAcesso,
             List<GuiasInss> guiasInss,
             String mensagemPagamento,
-            Integer numeroTelefone,
+            String numeroTelefone,
             boolean pagamentoPago,
             String statusPagamento,
             LocalDateTime dataPagamento,
             boolean acessoLiberado,
-            String token
+            String token,
+            Integer id
     ) {
 
         this.cpf = cpf;
@@ -92,6 +88,7 @@ public class LoginDTO {
         this.acessoLiberado = acessoLiberado;
 
         this.token = token;
+        this.id = id;
     }
 
 
@@ -105,7 +102,6 @@ public class LoginDTO {
     }
 
 
-
     public String getSenha() {
         return senha;
     }
@@ -114,6 +110,14 @@ public class LoginDTO {
         this.senha = senha;
     }
 
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
 
 
     public String getNome() {
@@ -125,7 +129,6 @@ public class LoginDTO {
     }
 
 
-
     public String getEmail() {
         return email;
     }
@@ -133,7 +136,6 @@ public class LoginDTO {
     public void setEmail(String email) {
         this.email = email;
     }
-
 
 
     public Usuario.TipoUsuario getTipo() {
@@ -145,7 +147,6 @@ public class LoginDTO {
     }
 
 
-
     public LocalDateTime getUltimoAcesso() {
         return ultimoAcesso;
     }
@@ -153,7 +154,6 @@ public class LoginDTO {
     public void setUltimoAcesso(LocalDateTime ultimoAcesso) {
         this.ultimoAcesso = ultimoAcesso;
     }
-
 
 
     public List<GuiasInss> getGuiasInss() {
@@ -165,7 +165,6 @@ public class LoginDTO {
     }
 
 
-
     public String getMensagemPagamento() {
         return mensagemPagamento;
     }
@@ -173,17 +172,6 @@ public class LoginDTO {
     public void setMensagemPagamento(String mensagemPagamento) {
         this.mensagemPagamento = mensagemPagamento;
     }
-
-
-
-    public Integer getNumeroTelefone() {
-        return numeroTelefone;
-    }
-
-    public void setNumeroTelefone(Integer numeroTelefone) {
-        this.numeroTelefone = numeroTelefone;
-    }
-
 
 
     public boolean isPagamentoPago() {
@@ -195,7 +183,6 @@ public class LoginDTO {
     }
 
 
-
     public String getStatusPagamento() {
         return statusPagamento;
     }
@@ -203,7 +190,6 @@ public class LoginDTO {
     public void setStatusPagamento(String statusPagamento) {
         this.statusPagamento = statusPagamento;
     }
-
 
 
     public LocalDateTime getDataPagamento() {
@@ -215,6 +201,14 @@ public class LoginDTO {
     }
 
 
+    public String getNumeroTelefone() {
+        return numeroTelefone;
+    }
+
+    public void setNumeroTelefone(String numeroTelefone) {
+        this.numeroTelefone = numeroTelefone;
+    }
+
 
     public boolean isAcessoLiberado() {
         return acessoLiberado;
@@ -223,7 +217,6 @@ public class LoginDTO {
     public void setAcessoLiberado(boolean acessoLiberado) {
         this.acessoLiberado = acessoLiberado;
     }
-
 
 
     public String getToken() {

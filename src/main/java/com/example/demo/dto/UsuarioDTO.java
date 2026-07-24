@@ -11,7 +11,7 @@ public class UsuarioDTO {
     private String cpf;
     private String senha;
     private Usuario.TipoUsuario tipo;
-    private Integer numeroTelefone;
+    private String numeroTelefone;
 
 
     public UsuarioDTO() {
@@ -24,7 +24,7 @@ public class UsuarioDTO {
             String email,
             String endereco,
             String cpf,
-            Integer numeroTelefone
+            String numeroTelefone
     ) {
         this.id = id;
         this.nome = nome;
@@ -56,7 +56,6 @@ public class UsuarioDTO {
         return id;
     }
 
-
     public void setId(Integer id) {
         this.id = id;
     }
@@ -65,7 +64,6 @@ public class UsuarioDTO {
     public String getNome() {
         return nome;
     }
-
 
     public void setNome(String nome) {
         this.nome = nome;
@@ -76,7 +74,6 @@ public class UsuarioDTO {
         return email;
     }
 
-
     public void setEmail(String email) {
         this.email = email;
     }
@@ -85,7 +82,6 @@ public class UsuarioDTO {
     public String getEndereco() {
         return endereco;
     }
-
 
     public void setEndereco(String endereco) {
         this.endereco = endereco;
@@ -96,7 +92,6 @@ public class UsuarioDTO {
         return cpf;
     }
 
-
     public void setCpf(String cpf) {
         this.cpf = cpf;
     }
@@ -106,25 +101,25 @@ public class UsuarioDTO {
         return tipo;
     }
 
-
     public void setTipo(Usuario.TipoUsuario tipo) {
         this.tipo = tipo;
     }
+
 
     public String getSenha() {
         return senha;
     }
 
-
     public void setSenha(String senha) {
         this.senha = senha;
     }
 
-    public Integer getNumeroTelefone(){
-        return this.numeroTelefone;
+
+    public String getNumeroTelefone() {
+        return numeroTelefone;
     }
 
-    public void setNumeroTelefone(Integer numeroTelefone){
+    public void setNumeroTelefone(String numeroTelefone) {
         this.numeroTelefone = numeroTelefone;
     }
 }

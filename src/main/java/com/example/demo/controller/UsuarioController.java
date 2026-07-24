@@ -1,12 +1,7 @@
 package com.example.demo.controller;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.example.demo.entity.GuiasInss;
 import com.example.demo.service.UsuarioService;
@@ -15,19 +10,45 @@ import com.example.demo.service.UsuarioService;
 @RequestMapping("/api")
 @CrossOrigin(origins = "*")
 public class UsuarioController {
+
     private final UsuarioService usuarioService;
+
 
     public UsuarioController(UsuarioService usuarioService) {
         this.usuarioService = usuarioService;
     }
 
-    @PostMapping("/pagamento/{usuarioId}")
-    public ResponseEntity<GuiasInss> registrarPagamento(
+
+
+    // Criar uma nova guia INSS
+    @PostMapping("/guias/{usuarioId}")
+    public ResponseEntity<GuiasInss> criarGuia(
             @PathVariable Integer usuarioId,
             @RequestBody GuiasInss guiaInss) {
 
-        GuiasInss novoPagamento = usuarioService.paymentRegister(usuarioId, guiaInss);
 
-        return ResponseEntity.ok(novoPagamento);
+        GuiasInss novaGuia = usuarioService.criarGuia(
+                usuarioId,
+                guiaInss
+        );
+
+
+        return ResponseEntity.ok(novaGuia);
     }
+
+
+
+    // Confirmar pagamento da guia
+    @PutMapping("/pagamento/{guiaId}")
+    public ResponseEntity<GuiasInss> confirmarPagamento(
+            @PathVariable Integer guiaId) {
+
+
+        GuiasInss guiaAtualizada =
+                usuarioService.confirmarPagamento(guiaId);
+
+
+        return ResponseEntity.ok(guiaAtualizada);
+    }
+
 }

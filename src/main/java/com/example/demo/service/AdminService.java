@@ -39,7 +39,7 @@ public class AdminService {
                         String endereco,
                         String cpf,
                         String senha,
-                        Integer numeroTelefone) {
+                        String numeroTelefone) {
 
                 if (clienteRepository.findByEmail(email).isPresent()) {
                         throw new CampoInvalidoexception(
@@ -51,11 +51,17 @@ public class AdminService {
                                         "CPF já cadastrado!");
                 }
 
-                Usuario usuario = new Usuario();
-
-                if (usuario.getNumeroTelefone() != 11) {
-                        throw new CampoInvalidoexception("O numero precisa ter exatamente 11 digitos");
+                if (numeroTelefone == null || numeroTelefone.isBlank()) {
+                        throw new CampoInvalidoexception(
+                                        "Número de telefone obrigatório!");
                 }
+
+                if (numeroTelefone.length() != 11) {
+                        throw new CampoInvalidoexception(
+                                        "O número precisa ter exatamente 11 dígitos");
+                }
+
+                Usuario usuario = new Usuario();
 
                 usuario.setNome(nome);
                 usuario.setEmail(email);
@@ -145,18 +151,9 @@ public class AdminService {
         }
 
         // PEGAR GUIA DO Usuario
-        public GuiasInss findByGuia(Integer id) {
+        public List<GuiasInss> findByGuia(Integer usuarioId) {
 
-                return guiasInssRepository.findById(id)
-                                .orElseThrow(() -> new RuntimeException("Guia não encontrada"));
+                return guiasInssRepository.findByUsuarioId(usuarioId);
 
-        }
-
-        // BUSCAR ÚLTIMO PAGAMENTO
-        public GuiasInss lastPayments(Usuario usuario) {
-
-                return guiasInssRepository
-                                .findTopByUsuarioOrderByDatapagamentoDesc(usuario)
-                                .orElseThrow(() -> new RuntimeException("Nenhum pagamento encontrado"));
         }
 }

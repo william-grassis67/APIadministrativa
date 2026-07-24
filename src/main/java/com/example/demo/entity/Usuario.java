@@ -33,7 +33,7 @@ public class Usuario {
     private LocalDateTime ultimoAcesso;
 
     @Column (name = "numeroTelefone")
-    private Integer numeroTelefone;
+    private String numeroTelefone;
 
     @Transient
     private boolean pagamentoPago;
@@ -70,8 +70,8 @@ public class Usuario {
             String cpf,
             String senha,
             TipoUsuario tipo,
-            LocalDateTime ultimoAcessom,
-            Integer numeroTelefone
+            LocalDateTime ultimoAcesso,
+            String numeroTelefone
 
     ) {
         this.id = id;
@@ -189,11 +189,11 @@ public class Usuario {
         this.pagamentos = pagamentos;
     }
 
-    public Integer getNumeroTelefone(){
+    public String getNumeroTelefone(){
         return this.numeroTelefone;
     }
 
-    public void setNumeroTelefone(Integer numeroTelefone){
+    public void setNumeroTelefone(String numeroTelefone){
         this.numeroTelefone = numeroTelefone;
     }
 }
