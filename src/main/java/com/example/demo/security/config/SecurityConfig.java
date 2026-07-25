@@ -1,119 +1,80 @@
 package com.example.demo.security.config;
 
+import java.util.List;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import java.util.List;
-
 @Configuration
 public class SecurityConfig {
-
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
         http
+                .csrf(csrf -> csrf.disable())
 
-            // API REST não usa CSRF
-            .csrf(csrf -> csrf.disable())
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
 
+                .authorizeHttpRequests(auth -> auth
 
-            // Ativa CORS configurado abaixo
-            .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+                        // Libera todas as requisições OPTIONS (preflight)
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
 
+                        // Login
+                        .requestMatchers("/api/login").permitAll()
 
-            .authorizeHttpRequests(auth -> auth
+                        // Cadastro
+                        .requestMatchers("/api/register").permitAll()
 
-                // Login
-                .requestMatchers(
-                        "/api/login"
-                ).permitAll()
-
-
-                // Cadastro
-                .requestMatchers(
-                        "/api/register"
-                ).permitAll()
-
-
-                // Pagamentos INSS
-                .requestMatchers(
-                        "/api/pagamento/**",
-                        "/api/payments/**",
-                        "/api/guias/**"
-                ).permitAll()
-
-
-                // Administração
-                .requestMatchers(
-                        "/api/admin/**",
-                        "/api/usuarios/**",
-                        "/api/clientes"
-                ).permitAll()
-
-
-                // Libera restante da API
-                .anyRequest().permitAll()
-
-            );
-
+                        // Restante da API
+                        .anyRequest().permitAll());
 
         return http.build();
-
     }
-
-
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
 
-
         CorsConfiguration configuration = new CorsConfiguration();
 
-
         configuration.setAllowedOrigins(List.of(
-
                 "http://localhost:5500",
-                "http://127.0.0.1:5500"
-
+                "http://127.0.0.1:5500",
+                "https://sapimanagerdministration.vercel.app"
         ));
 
-
         configuration.setAllowedMethods(List.of(
-
                 "GET",
                 "POST",
                 "PUT",
                 "DELETE",
+                "PATCH",
                 "OPTIONS"
-
         ));
-
 
         configuration.setAllowedHeaders(List.of("*"));
 
+        configuration.setExposedHeaders(List.of(
+                "Authorization",
+                "Content-Type"
+        ));
 
         configuration.setAllowCredentials(true);
 
-
+        configuration.setMaxAge(3600L);
 
         UrlBasedCorsConfigurationSource source =
                 new UrlBasedCorsConfigurationSource();
 
-
-        source.registerCorsConfiguration(
-                "/**",
-                configuration
-        );
-
+        source.registerCorsConfiguration("/**", configuration);
 
         return source;
-
     }
-
 }
