@@ -11,70 +11,133 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+
 @Configuration
 public class SecurityConfig {
+
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
+
         http
-                .csrf(csrf -> csrf.disable())
 
-                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+            // Desabilita CSRF para API REST
+            .csrf(csrf -> csrf.disable())
 
-                .authorizeHttpRequests(auth -> auth
 
-                        // Libera todas as requisições OPTIONS (preflight)
-                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+            // Configuração CORS
+            .cors(cors -> cors.configurationSource(corsConfigurationSource()))
 
-                        // Login
-                        .requestMatchers("/api/login").permitAll()
 
-                        // Cadastro
-                        .requestMatchers("/api/register").permitAll()
+            // Permissões
+            .authorizeHttpRequests(auth -> auth
 
-                        // Restante da API
-                        .anyRequest().permitAll());
+
+                // Libera requisições OPTIONS (CORS Preflight)
+                .requestMatchers(HttpMethod.OPTIONS, "/**")
+                .permitAll()
+
+
+                // Rotas públicas
+                .requestMatchers("/api/login")
+                .permitAll()
+
+
+                .requestMatchers("/api/register")
+                .permitAll()
+
+
+                // Temporariamente libera todas as rotas
+                // depois pode trocar por authenticated()
+                .anyRequest()
+                .permitAll()
+            );
+
 
         return http.build();
     }
 
+
+
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
 
-        CorsConfiguration configuration = new CorsConfiguration();
 
-        configuration.setAllowedOrigins(List.of(
-                "http://localhost:5500",
-                "http://127.0.0.1:5500",
-                "https://sapimanagerdministration.vercel.app"
+        CorsConfiguration config = new CorsConfiguration();
+
+
+        /*
+         * Permite frontend local
+         * e produção na Vercel
+         */
+        config.setAllowedOriginPatterns(List.of(
+
+                "https://sapimanageradministration.vercel.app",
+                "https://*.vercel.app",
+
+                "http://localhost:*",
+                "http://127.0.0.1:*"
         ));
 
-        configuration.setAllowedMethods(List.of(
-                "GET",
-                "POST",
-                "PUT",
-                "DELETE",
-                "PATCH",
-                "OPTIONS"
+
+
+        /*
+         * Métodos permitidos
+         */
+        config.setAllowedMethods(List.of(
+
+                HttpMethod.GET.name(),
+                HttpMethod.POST.name(),
+                HttpMethod.PUT.name(),
+                HttpMethod.PATCH.name(),
+                HttpMethod.DELETE.name(),
+                HttpMethod.OPTIONS.name()
         ));
 
-        configuration.setAllowedHeaders(List.of("*"));
 
-        configuration.setExposedHeaders(List.of(
-                "Authorization",
-                "Content-Type"
+
+        /*
+         * Aceita qualquer header enviado pelo frontend
+         */
+        config.setAllowedHeaders(List.of("*"));
+
+
+
+        /*
+         * Headers que o navegador pode ler
+         */
+        config.setExposedHeaders(List.of(
+                "Authorization"
         ));
 
-        configuration.setAllowCredentials(true);
 
-        configuration.setMaxAge(3600L);
+
+        /*
+         * Permite cookies e Authorization
+         */
+        config.setAllowCredentials(true);
+
+
+
+        /*
+         * Cache do preflight
+         */
+        config.setMaxAge(3600L);
+
+
 
         UrlBasedCorsConfigurationSource source =
                 new UrlBasedCorsConfigurationSource();
 
-        source.registerCorsConfiguration("/**", configuration);
+
+        source.registerCorsConfiguration(
+                "/**",
+                config
+        );
+
 
         return source;
     }
+
 }
