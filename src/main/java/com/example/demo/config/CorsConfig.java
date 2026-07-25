@@ -21,7 +21,8 @@ public class CorsConfig {
                 "http://localhost:5500",
                 "http://127.0.0.1:5500",
                 "http://localhost:8080",
-                "https://sapimanageradministration.vercel.app"
+                "https://sapimanageradministration.vercel.app",
+                "https://sapimanageradministration.vercel.app/index.html"
         ));
 
         // Métodos permitidos
