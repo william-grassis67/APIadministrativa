@@ -21,7 +21,7 @@ public class CorsConfig {
                 "http://localhost:5500",
                 "http://127.0.0.1:5500",
                 "http://localhost:8080",
-                "https://sapimanageradministration.vercel.app/"
+                "https://sapimanageradministration.vercel.app"
         ));
 
         // Métodos permitidos
@@ -37,16 +37,16 @@ public class CorsConfig {
         // Cabeçalhos permitidos
         config.setAllowedHeaders(List.of("*"));
 
-        // Cabeçalhos expostos (opcional)
+        // Cabeçalhos expostos
         config.setExposedHeaders(List.of(
                 "Authorization",
                 "Content-Type"
         ));
 
-        // Permitir envio de cookies/token
+        // Permitir cookies/token
         config.setAllowCredentials(true);
 
-        // Cache do preflight por 1 hora
+        // Cache do preflight
         config.setMaxAge(3600L);
 
         UrlBasedCorsConfigurationSource source =
