@@ -50,6 +50,9 @@ public class Usuario {
     @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL)
     private List<GuiasInss> pagamentos = new ArrayList<>();
 
+    @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL)
+    private List<Processo> processo = new ArrayList<>();
+
     public enum TipoUsuario {
         ADMIN,
         CLIENTE
@@ -187,6 +190,14 @@ public class Usuario {
 
     public void setGuiasInss(List<GuiasInss> pagamentos) {
         this.pagamentos = pagamentos;
+    }
+
+    public List<Processo> getProcesso(){
+        return this.processo;
+    }
+
+    public void setProcesso(List<Processo> processo){
+        this.processo = processo;
     }
 
     public String getNumeroTelefone(){

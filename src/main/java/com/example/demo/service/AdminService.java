@@ -2,15 +2,27 @@ package com.example.demo.service;
 
 import com.example.demo.dto.UsuarioDTO;
 import com.example.demo.entity.GuiasInss;
+import com.example.demo.entity.Processo;
 //import com.example.demo.entity.Pagamento;
 import com.example.demo.entity.Usuario;
+import com.example.demo.entity.Processo.StatusProcesso;
 import com.example.demo.exception.CampoInvalidoexception;
 import com.example.demo.repository.ClienteRepository;
 import com.example.demo.repository.GuiasInssRepository;
+import com.example.demo.repository.ProcessoRepository;
+
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+
 //import com.example.demo.repository.PagamentoRepository;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
+import com.example.demo.entity.Processo;
+
+import java.time.LocalDateTime;
+
+//Source: demo
 
 import java.util.List;
 import java.util.Objects;
@@ -20,16 +32,19 @@ public class AdminService {
 
         private final ClienteRepository clienteRepository;
         private final GuiasInssRepository guiasInssRepository;
+        private final ProcessoRepository processoRepository;
 
         public AdminService(
                         ClienteRepository clienteRepository,
                         // PagamentoRepository pagamentoRepository,
                         // PagamentoService pagamentoService,
-                        GuiasInssRepository guiasInssRepository) {
+                        GuiasInssRepository guiasInssRepository,
+                ProcessoRepository processoRepository) {
                 this.clienteRepository = clienteRepository;
                 // this.pagamentoRepository = pagamentoRepository;
                 // this.pagamentoService = pagamentoService;
                 this.guiasInssRepository = guiasInssRepository;
+                this.processoRepository = processoRepository;
         }
 
         // CADASTRAR CLIENTE
@@ -156,4 +171,46 @@ public class AdminService {
                 return guiasInssRepository.findByUsuarioId(usuarioId);
 
         }
+
+        // CRIAR Processo
+        public Processo registrarProcesso(Processo processo, Integer usuarioId) {
+
+                Usuario usuario = clienteRepository.findById(usuarioId).orElseThrow(() -> new RuntimeException("Nenhum usuario foi encontrado!"));
+
+                processo.setUsuario(usuario);
+                processo.setBiometriaRealizada(false);
+                processo.setDataCriacao(LocalDateTime.now());
+
+                
+                //processo.setPendencia(processo.getPendencia());
+                //processo.setStatus(processo.getStatus());
+                //processo.setTipo(processo.getTipo());
+                //processo.setValorProcesso(processo.getValorProcesso());
+
+                processoRepository.save(processo);
+                return processo;
+        }
+
+        public Usuario buscarPorId(Integer id){
+                return clienteRepository.findById(id)
+                        .orElseThrow(() -> new RuntimeException("nenhum usuario encontrado"));
+        }
+
+        public Processo atualizaProcessoStatus(Integer processoId, StatusProcesso status){
+
+                Processo processo = processoRepository.findById(processoId).orElseThrow(() -> new RuntimeException("processo não encontrado!"));
+                processo.setStatus(status);
+                //usuario.getProcesso().forEach(p -> p.se);
+                return processo;
+        }
+
+        public Processo atualizaProcessoFinish(Integer processoId){
+                Processo processo = processoRepository.findById(processoId)
+                .orElseThrow(() -> new RuntimeException("Nenhum processo foi encontrado!"));
+
+                processo.setDataConclusao(LocalDateTime.now());
+                return processo;
+        }       
+
+
 }

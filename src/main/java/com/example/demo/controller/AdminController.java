@@ -2,11 +2,14 @@ package com.example.demo.controller;
 
 import com.example.demo.dto.UsuarioDTO;
 import com.example.demo.entity.GuiasInss;
+import com.example.demo.entity.Processo;
 import com.example.demo.entity.Usuario;
 import com.example.demo.service.AdminService;
+import com.example.demo.service.ProcessoService;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -15,9 +18,11 @@ import java.util.List;
 public class AdminController {
 
     private final AdminService adminService;
+    private final ProcessoService processoService;
 
-    public AdminController(AdminService adminService) {
+    public AdminController(AdminService adminService, ProcessoService processoService) {
         this.adminService = adminService;
+        this.processoService = processoService;
     }
 
     // CADASTRAR CLIENTE
@@ -31,8 +36,7 @@ public class AdminController {
                 usuarioDTO.getEndereco(),
                 usuarioDTO.getCpf(),
                 usuarioDTO.getSenha(),
-                usuarioDTO.getNumeroTelefone()
-        );
+                usuarioDTO.getNumeroTelefone());
 
         return ResponseEntity.ok(usuarioCriado);
     }
@@ -76,8 +80,7 @@ public class AdminController {
             @PathVariable Integer usuarioId) {
 
         return ResponseEntity.ok(
-                adminService.findByGuia(usuarioId)
-        );
+                adminService.findByGuia(usuarioId));
     }
 
     // LISTAR TODAS AS GUIAS DO SISTEMA
@@ -85,7 +88,20 @@ public class AdminController {
     public ResponseEntity<List<GuiasInss>> listarTodasGuias() {
 
         return ResponseEntity.ok(
-                adminService.listarPagamentos()
-        );
+                adminService.listarPagamentos());
+    }
+
+    // CRIAR Processo
+    @PostMapping("/processos/{id}")
+    public Processo registrarProcesso(
+            @PathVariable Integer id,
+            @RequestBody Processo processo) {
+
+        return adminService.registrarProcesso(processo, id);
+    }
+
+    @GetMapping("/cliente/processo/{id}")
+    public List<Processo> buscarProcesso(@PathVariable Integer id) {
+        return processoService.buscarProcessosPorUsuario(id);
     }
 }
