@@ -13,23 +13,22 @@ public class Documento {
     private Long id;
 
 
+    // Caminho onde o arquivo foi salvo
+    @Column(nullable = false)
+    private String caminho;
+
+
     // Nome original do arquivo enviado
+    @Column(nullable = false)
     private String nome;
 
 
-    // Tipo do arquivo (image/png, application/pdf...)
+    // Tipo do arquivo (application/pdf, image/png...)
     private String tipo;
 
 
     // Tamanho do arquivo em bytes
     private Long tamanho;
-
-
-    // Arquivo salvo diretamente no banco
-    @Lob
-    @Column(columnDefinition = "LONGBLOB")
-    @JsonIgnore
-    private byte[] dados;
 
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -44,23 +43,33 @@ public class Documento {
 
     public Documento(
             Long id,
+            String caminho,
             String nome,
             String tipo,
             Long tamanho,
-            byte[] dados,
             Processo processo
     ) {
         this.id = id;
+        this.caminho = caminho;
         this.nome = nome;
         this.tipo = tipo;
         this.tamanho = tamanho;
-        this.dados = dados;
         this.processo = processo;
     }
 
 
     public Long getId() {
         return id;
+    }
+
+
+    public String getCaminho() {
+        return caminho;
+    }
+
+
+    public void setCaminho(String caminho) {
+        this.caminho = caminho;
     }
 
 
@@ -91,16 +100,6 @@ public class Documento {
 
     public void setTamanho(Long tamanho) {
         this.tamanho = tamanho;
-    }
-
-
-    public byte[] getDados() {
-        return dados;
-    }
-
-
-    public void setDados(byte[] dados) {
-        this.dados = dados;
     }
 
 
