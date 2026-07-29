@@ -10,43 +10,60 @@ import com.example.demo.entity.Processo;
 import com.example.demo.service.ProcessoService;
 import com.example.demo.service.UsuarioService;
 
+
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/cliente")
 public class UsuarioController {
+
 
     private final UsuarioService usuarioService;
     private final ProcessoService processoService;
 
-    public UsuarioController(UsuarioService usuarioService, ProcessoService processoService) {
+
+    public UsuarioController(
+            UsuarioService usuarioService,
+            ProcessoService processoService) {
+
         this.usuarioService = usuarioService;
         this.processoService = processoService;
     }
 
-    // Criar uma nova guia INSS
-    @PostMapping("/guias/{usuarioId}")
-    public ResponseEntity<GuiasInss> criarGuia(
-            @PathVariable Integer usuarioId,
-            @RequestBody GuiasInss guiaInss) {
 
-        GuiasInss novaGuia = usuarioService.criarGuia(
-                usuarioId,
-                guiaInss);
 
-        return ResponseEntity.ok(novaGuia);
-    }
+    // ============================
+    // CLIENTE CONFIRMA PAGAMENTO
+    // ============================
 
-    // Confirmar pagamento da guia
     @PutMapping("/pagamento/{guiaId}")
     public ResponseEntity<GuiasInss> confirmarPagamento(
             @PathVariable Integer guiaId) {
 
-        GuiasInss guiaAtualizada = usuarioService.confirmarPagamento(guiaId);
+
+        GuiasInss guiaAtualizada =
+                usuarioService.confirmarPagamento(guiaId);
+
 
         return ResponseEntity.ok(guiaAtualizada);
     }
 
-    @GetMapping("/me/processos/{id}")
-    public List<Processo> buscarProcesso(@PathVariable("id") Integer userId) {
-        return processoService.buscarProcessosPorUsuario(userId);
+
+
+
+
+    // ============================
+    // CLIENTE CONSULTA PROCESSOS
+    // ============================
+
+    @GetMapping("/processos/{usuarioId}")
+    public ResponseEntity<List<Processo>> buscarProcessos(
+            @PathVariable Integer usuarioId) {
+
+
+        List<Processo> processos =
+                processoService.buscarProcessosPorUsuario(usuarioId);
+
+
+        return ResponseEntity.ok(processos);
     }
+
 }

@@ -1,107 +1,181 @@
 package com.example.demo.controller;
 
 import com.example.demo.dto.UsuarioDTO;
+import com.example.demo.entity.Documento;
 import com.example.demo.entity.GuiasInss;
 import com.example.demo.entity.Processo;
 import com.example.demo.entity.Usuario;
 import com.example.demo.service.AdminService;
-import com.example.demo.service.ProcessoService;
+import com.example.demo.service.DocumentoService;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
+
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/admin")
 public class AdminController {
 
-    private final AdminService adminService;
-    private final ProcessoService processoService;
 
-    public AdminController(AdminService adminService, ProcessoService processoService) {
+    private final AdminService adminService;
+    private final DocumentoService documentoService;
+
+
+    public AdminController(
+            AdminService adminService,
+            DocumentoService documentoService) {
+
         this.adminService = adminService;
-        this.processoService = processoService;
+        this.documentoService = documentoService;
     }
 
+
+
+    // ============================
     // CADASTRAR CLIENTE
+    // ============================
+
     @PostMapping("/register")
     public ResponseEntity<UsuarioDTO> registerUser(
             @RequestBody UsuarioDTO usuarioDTO) {
 
-        UsuarioDTO usuarioCriado = adminService.registerUser(
-                usuarioDTO.getNome(),
-                usuarioDTO.getEmail(),
-                usuarioDTO.getEndereco(),
-                usuarioDTO.getCpf(),
-                usuarioDTO.getSenha(),
-                usuarioDTO.getNumeroTelefone());
+
+        UsuarioDTO usuarioCriado =
+                adminService.registerUser(
+                        usuarioDTO.getNome(),
+                        usuarioDTO.getEmail(),
+                        usuarioDTO.getEndereco(),
+                        usuarioDTO.getCpf(),
+                        usuarioDTO.getSenha(),
+                        usuarioDTO.getNumeroTelefone()
+                );
+
 
         return ResponseEntity.ok(usuarioCriado);
     }
 
+
+
+
+    // ============================
     // REMOVER CLIENTE
-    @DeleteMapping("/remove/{cpf}")
-    public ResponseEntity<Void> removeUser(@PathVariable String cpf) {
+    // ============================
+
+    @DeleteMapping("/clientes/{cpf}")
+    public ResponseEntity<Void> removeUser(
+            @PathVariable String cpf) {
+
 
         adminService.removeUser(cpf);
 
         return ResponseEntity.noContent().build();
     }
 
-    // LISTAR TODOS OS USUÁRIOS
-    @GetMapping("/users")
-    public ResponseEntity<List<Usuario>> listUsers(
-            @RequestParam(required = false) String cpf) {
 
-        if (cpf != null && !cpf.isBlank()) {
-            adminService.validarAcessoAdministrador(cpf);
-        }
 
-        return ResponseEntity.ok(adminService.listUsers());
-    }
 
+
+    // ============================
     // LISTAR CLIENTES
+    // ============================
+
     @GetMapping("/clientes")
-    public ResponseEntity<List<Usuario>> listClientes(
-            @RequestParam(required = false) String cpf) {
-
-        if (cpf != null && !cpf.isBlank()) {
-            adminService.validarAcessoAdministrador(cpf);
-        }
-
-        return ResponseEntity.ok(adminService.listClientes());
-    }
-
-    // LISTAR GUIAS DE UM USUÁRIO ESPECÍFICO
-    @GetMapping("/payments/guias/{usuarioId}")
-    public ResponseEntity<List<GuiasInss>> listarGuiasUsuario(
-            @PathVariable Integer usuarioId) {
+    public ResponseEntity<List<Usuario>> listClientes() {
 
         return ResponseEntity.ok(
-                adminService.findByGuia(usuarioId));
+                adminService.listClientes()
+        );
     }
 
-    // LISTAR TODAS AS GUIAS DO SISTEMA
-    @GetMapping("/payments/guias")
-    public ResponseEntity<List<GuiasInss>> listarTodasGuias() {
 
-        return ResponseEntity.ok(
-                adminService.listarPagamentos());
-    }
 
-    // CRIAR Processo
-    @PostMapping("/processos/{id}")
-    public Processo registrarProcesso(
-            @PathVariable Integer id,
+
+
+    // ============================
+    // CRIAR PROCESSO PARA CLIENTE
+    // ============================
+
+    @PostMapping("/processos/{usuarioId}")
+    public ResponseEntity<Processo> criarProcesso(
+            @PathVariable Integer usuarioId,
             @RequestBody Processo processo) {
 
-        return adminService.registrarProcesso(processo, id);
+
+        Processo novoProcesso =
+                adminService.registrarProcesso(
+                        processo,
+                        usuarioId
+                );
+
+
+        return ResponseEntity.ok(novoProcesso);
     }
 
-    @GetMapping("/cliente/processo/{id}")
-    public List<Processo> buscarProcesso(@PathVariable Integer id) {
-        return processoService.buscarProcessosPorUsuario(id);
+
+
+
+
+    // ============================
+    // ADICIONAR DOCUMENTO AO PROCESSO
+    // ============================
+
+    @PostMapping(
+            value = "/processos/{processoId}/documentos",
+            consumes = "multipart/form-data"
+    )
+    public ResponseEntity<Documento> adicionarDocumento(
+            @PathVariable Integer processoId,
+            @RequestParam("arquivo") MultipartFile arquivo
+    ) throws IOException {
+
+
+        Documento documento =
+                documentoService.salvarDocumento(
+                        arquivo,
+                        processoId
+                );
+
+
+        return ResponseEntity.ok(documento);
     }
+
+
+
+
+
+    // ============================
+    // LISTAR GUIAS DE UM CLIENTE
+    // ============================
+
+    @GetMapping("/clientes/{usuarioId}/guias")
+    public ResponseEntity<List<GuiasInss>> listarGuiasCliente(
+            @PathVariable Integer usuarioId) {
+
+
+        return ResponseEntity.ok(
+                adminService.findByGuia(usuarioId)
+        );
+    }
+
+
+
+
+
+    // ============================
+    // LISTAR TODOS OS PAGAMENTOS
+    // ============================
+
+    @GetMapping("/pagamentos")
+    public ResponseEntity<List<GuiasInss>> listarPagamentos() {
+
+
+        return ResponseEntity.ok(
+                adminService.listarPagamentos()
+        );
+    }
+
 }

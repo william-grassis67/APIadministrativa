@@ -1,5 +1,7 @@
 package com.example.demo.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -12,17 +14,27 @@ public class Processo {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @ManyToOne
+
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "usuario_id", nullable = false)
+    @JsonIgnore
     private Usuario usuario;
 
-    @OneToMany(mappedBy = "processo", cascade = CascadeType.ALL, orphanRemoval = true)
+
+    @OneToMany(
+        mappedBy = "processo",
+        cascade = CascadeType.ALL,
+        orphanRemoval = true
+    )
     private List<Documento> documentos;
+
 
     private String tipo;
 
+
     @Enumerated(EnumType.STRING)
     private StatusProcesso status;
+
 
     public enum StatusProcesso {
         AGUARDANDO_DOCUMENTOS,
@@ -30,6 +42,7 @@ public class Processo {
         AGUARDANDO_PAGAMENTO,
         FINALIZADO
     }
+
 
     private String numeroProcesso;
 
@@ -39,12 +52,15 @@ public class Processo {
 
     private String documentosPendentes;
 
+
     @Column(columnDefinition = "TEXT")
     private String observacao;
+
 
     private Boolean pagamentoRealizado;
 
     private Boolean biometriaRealizada;
+
 
     private LocalDateTime dataCriacao;
 
@@ -52,8 +68,10 @@ public class Processo {
 
     private LocalDateTime dataConclusao;
 
+
     public Processo() {
     }
+
 
     public Integer getId() {
         return id;
@@ -63,6 +81,7 @@ public class Processo {
         this.id = id;
     }
 
+
     public Usuario getUsuario() {
         return usuario;
     }
@@ -70,6 +89,7 @@ public class Processo {
     public void setUsuario(Usuario usuario) {
         this.usuario = usuario;
     }
+
 
     public List<Documento> getDocumentos() {
         return documentos;
@@ -79,6 +99,7 @@ public class Processo {
         this.documentos = documentos;
     }
 
+
     public String getTipo() {
         return tipo;
     }
@@ -86,6 +107,7 @@ public class Processo {
     public void setTipo(String tipo) {
         this.tipo = tipo;
     }
+
 
     public StatusProcesso getStatus() {
         return status;
@@ -95,6 +117,7 @@ public class Processo {
         this.status = status;
     }
 
+
     public String getNumeroProcesso() {
         return numeroProcesso;
     }
@@ -102,6 +125,7 @@ public class Processo {
     public void setNumeroProcesso(String numeroProcesso) {
         this.numeroProcesso = numeroProcesso;
     }
+
 
     public Double getValorProcesso() {
         return valorProcesso;
@@ -111,6 +135,7 @@ public class Processo {
         this.valorProcesso = valorProcesso;
     }
 
+
     public String getPendencias() {
         return pendencias;
     }
@@ -119,13 +144,15 @@ public class Processo {
         this.pendencias = pendencias;
     }
 
+
     public String getDocumentosPendentes() {
-        return documentosPendentes;
+    return documentosPendentes;
     }
 
     public void setDocumentosPendentes(String documentosPendentes) {
         this.documentosPendentes = documentosPendentes;
     }
+
 
     public String getObservacao() {
         return observacao;
@@ -135,6 +162,7 @@ public class Processo {
         this.observacao = observacao;
     }
 
+
     public Boolean getPagamentoRealizado() {
         return pagamentoRealizado;
     }
@@ -142,6 +170,7 @@ public class Processo {
     public void setPagamentoRealizado(Boolean pagamentoRealizado) {
         this.pagamentoRealizado = pagamentoRealizado;
     }
+
 
     public Boolean getBiometriaRealizada() {
         return biometriaRealizada;
@@ -151,6 +180,7 @@ public class Processo {
         this.biometriaRealizada = biometriaRealizada;
     }
 
+
     public LocalDateTime getDataCriacao() {
         return dataCriacao;
     }
@@ -159,6 +189,7 @@ public class Processo {
         this.dataCriacao = dataCriacao;
     }
 
+
     public LocalDateTime getUltimaAtualizacao() {
         return ultimaAtualizacao;
     }
@@ -166,6 +197,7 @@ public class Processo {
     public void setUltimaAtualizacao(LocalDateTime ultimaAtualizacao) {
         this.ultimaAtualizacao = ultimaAtualizacao;
     }
+
 
     public LocalDateTime getDataConclusao() {
         return dataConclusao;
