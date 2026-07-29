@@ -16,6 +16,7 @@ public class UsuarioController {
 
     private final UsuarioService usuarioService;
     private final ProcessoService processoService;
+
     public UsuarioController(UsuarioService usuarioService, ProcessoService processoService) {
         this.usuarioService = usuarioService;
         this.processoService = processoService;
@@ -29,8 +30,7 @@ public class UsuarioController {
 
         GuiasInss novaGuia = usuarioService.criarGuia(
                 usuarioId,
-                guiaInss
-        );
+                guiaInss);
 
         return ResponseEntity.ok(novaGuia);
     }
@@ -40,14 +40,13 @@ public class UsuarioController {
     public ResponseEntity<GuiasInss> confirmarPagamento(
             @PathVariable Integer guiaId) {
 
-        GuiasInss guiaAtualizada =
-                usuarioService.confirmarPagamento(guiaId);
+        GuiasInss guiaAtualizada = usuarioService.confirmarPagamento(guiaId);
 
         return ResponseEntity.ok(guiaAtualizada);
     }
 
     @GetMapping("/me/processos/{id}")
-    public List<Processo> buscarProcesso(@PathVariable Integer userId){
+    public List<Processo> buscarProcesso(@PathVariable("id") Integer userId) {
         return processoService.buscarProcessosPorUsuario(userId);
     }
 }
