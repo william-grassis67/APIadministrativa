@@ -9,13 +9,20 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 public class DocumentoService {
 
     private final DocumentoRepository documentoRepository;
     private final ProcessoRepository processoRepository;
+
+
+    private final String pastaUpload = "uploads";
 
 
     public DocumentoService(
@@ -28,7 +35,7 @@ public class DocumentoService {
 
 
 
-    // Salvar documento (imagem/PDF)
+    // Salvar documento
     public Documento salvarDocumento(
             MultipartFile arquivo,
             Integer processoId
@@ -41,23 +48,53 @@ public class DocumentoService {
                 );
 
 
+        // cria pasta caso não exista
+        Path diretorio = Paths.get(pastaUpload);
+
+        if (!Files.exists(diretorio)) {
+            Files.createDirectories(diretorio);
+        }
+
+
+        // cria nome único para evitar conflito
+        String nomeArquivo =
+                UUID.randomUUID()
+                + "_"
+                + arquivo.getOriginalFilename();
+
+
+        Path caminhoArquivo = diretorio.resolve(nomeArquivo);
+
+
+        // salva arquivo no servidor
+        Files.write(
+                caminhoArquivo,
+                arquivo.getBytes()
+        );
+
+
         Documento documento = new Documento();
+
+
+        documento.setCaminho(
+                caminhoArquivo.toString()
+        );
+
 
         documento.setNome(
                 arquivo.getOriginalFilename()
         );
 
+
         documento.setTipo(
                 arquivo.getContentType()
         );
+
 
         documento.setTamanho(
                 arquivo.getSize()
         );
 
-        documento.setDados(
-                arquivo.getBytes()
-        );
 
         documento.setProcesso(processo);
 
@@ -67,11 +104,10 @@ public class DocumentoService {
 
 
 
-    // Buscar todos os documentos
+    // Buscar todos documentos
     public List<Documento> listarDocumentos() {
 
         return documentoRepository.findAll();
-
     }
 
 
@@ -99,20 +135,47 @@ public class DocumentoService {
 
         if (arquivo != null && !arquivo.isEmpty()) {
 
+
+            Path diretorio = Paths.get(pastaUpload);
+
+            if (!Files.exists(diretorio)) {
+                Files.createDirectories(diretorio);
+            }
+
+
+            String nomeArquivo =
+                    UUID.randomUUID()
+                    + "_"
+                    + arquivo.getOriginalFilename();
+
+
+            Path caminhoArquivo =
+                    diretorio.resolve(nomeArquivo);
+
+
+            Files.write(
+                    caminhoArquivo,
+                    arquivo.getBytes()
+            );
+
+
+            documento.setCaminho(
+                    caminhoArquivo.toString()
+            );
+
+
             documento.setNome(
                     arquivo.getOriginalFilename()
             );
+
 
             documento.setTipo(
                     arquivo.getContentType()
             );
 
+
             documento.setTamanho(
                     arquivo.getSize()
-            );
-
-            documento.setDados(
-                    arquivo.getBytes()
             );
         }
 
