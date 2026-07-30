@@ -3,7 +3,7 @@ package com.example.demo.entity;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import jakarta.persistence.*;
 
@@ -38,9 +38,12 @@ public class GuiasInss {
     private String mensagemPagamento;
 
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "usuario_id", nullable = false)
-    @JsonIgnore
+    @JsonIgnoreProperties({
+            "guias",
+            "senha"
+    })
     private Usuario usuario;
 
 
@@ -59,7 +62,8 @@ public class GuiasInss {
             Double valor,
             boolean pago,
             LocalDateTime dataPagamento,
-            String mensagemPagamento
+            String mensagemPagamento,
+            Usuario usuario
     ) {
         this.id = id;
         this.competencia = competencia;
@@ -68,6 +72,7 @@ public class GuiasInss {
         this.pago = pago;
         this.dataPagamento = dataPagamento;
         this.mensagemPagamento = mensagemPagamento;
+        this.usuario = usuario;
     }
 
 
@@ -116,12 +121,12 @@ public class GuiasInss {
 
 
 
-    public boolean isPaga() {
+    public boolean isPago() {
         return pago;
     }
 
 
-    public void setPaga(boolean pago) {
+    public void setPago(boolean pago) {
         this.pago = pago;
     }
 

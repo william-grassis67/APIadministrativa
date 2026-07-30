@@ -20,13 +20,17 @@ public class UsuarioController {
     private final ProcessoService processoService;
 
 
+
     public UsuarioController(
             UsuarioService usuarioService,
             ProcessoService processoService) {
 
         this.usuarioService = usuarioService;
         this.processoService = processoService;
+
     }
+
+
 
 
 
@@ -44,7 +48,10 @@ public class UsuarioController {
 
 
         return ResponseEntity.ok(guiaAtualizada);
+
     }
+
+
 
 
 
@@ -64,6 +71,31 @@ public class UsuarioController {
 
 
         return ResponseEntity.ok(processos);
+
     }
+
+
+
+
+
+
+
+    // ============================
+    // CLIENTE CONSULTA SUAS GUIAS
+    // ============================
+
+    @GetMapping("/guias/{usuarioId}")
+    public ResponseEntity<List<GuiasInss>> buscarGuias(
+            @PathVariable Integer usuarioId) {
+
+
+        List<GuiasInss> guias =
+                usuarioService.buscarGuiasPorUsuario(usuarioId);
+
+
+        return ResponseEntity.ok(guias);
+
+    }
+
 
 }
