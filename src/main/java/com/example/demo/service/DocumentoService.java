@@ -1,5 +1,6 @@
 package com.example.demo.service;
 
+import com.example.demo.dto.DocumentoDTO;
 import com.example.demo.entity.Documento;
 import com.example.demo.entity.Processo;
 import com.example.demo.repository.DocumentoRepository;
@@ -9,14 +10,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.nio.file.*;
 import java.util.List;
 import java.util.UUID;
 
 @Service
 public class DocumentoService {
+
 
     private final DocumentoRepository documentoRepository;
     private final ProcessoRepository processoRepository;
@@ -25,9 +25,11 @@ public class DocumentoService {
     private final String pastaUpload = "uploads";
 
 
+
     public DocumentoService(
             DocumentoRepository documentoRepository,
-            ProcessoRepository processoRepository) {
+            ProcessoRepository processoRepository
+    ) {
 
         this.documentoRepository = documentoRepository;
         this.processoRepository = processoRepository;
@@ -36,49 +38,65 @@ public class DocumentoService {
 
 
     // Salvar documento
-    public Documento salvarDocumento(
+
+    public DocumentoDTO salvarDocumento(
             MultipartFile arquivo,
             Integer processoId
     ) throws IOException {
 
 
-        Processo processo = processoRepository.findById(processoId)
+        if (arquivo == null || arquivo.isEmpty()) {
+
+            throw new RuntimeException(
+                    "Arquivo obrigatório"
+            );
+        }
+
+
+
+        Processo processo =
+                processoRepository.findById(processoId)
+
                 .orElseThrow(() ->
-                        new RuntimeException("Processo não encontrado!")
-                );
+                        new RuntimeException(
+                                "Processo não encontrado!"
+                        ));
 
 
-        // cria pasta caso não exista
-        Path diretorio = Paths.get(pastaUpload);
+
+
+        Path diretorio =
+                Paths.get(pastaUpload);
+
+
 
         if (!Files.exists(diretorio)) {
+
             Files.createDirectories(diretorio);
         }
 
 
-        // cria nome único para evitar conflito
+
         String nomeArquivo =
                 UUID.randomUUID()
                 + "_"
                 + arquivo.getOriginalFilename();
 
 
-        Path caminhoArquivo = diretorio.resolve(nomeArquivo);
+
+        Path caminho =
+                diretorio.resolve(nomeArquivo);
 
 
-        // salva arquivo no servidor
+
         Files.write(
-                caminhoArquivo,
+                caminho,
                 arquivo.getBytes()
         );
 
 
+
         Documento documento = new Documento();
-
-
-        documento.setCaminho(
-                caminhoArquivo.toString()
-        );
 
 
         documento.setNome(
@@ -96,100 +114,114 @@ public class DocumentoService {
         );
 
 
+        documento.setCaminho(
+                caminho.toString()
+        );
+
+
         documento.setProcesso(processo);
 
 
-        return documentoRepository.save(documento);
+
+        Documento salvo =
+                documentoRepository.save(documento);
+
+
+
+        return converterDTO(salvo);
     }
 
 
 
-    // Buscar todos documentos
-    public List<Documento> listarDocumentos() {
 
-        return documentoRepository.findAll();
+    // Listar documentos
+
+    public List<DocumentoDTO> listarDocumentos() {
+
+
+        return documentoRepository.findAll()
+
+                .stream()
+
+                .map(this::converterDTO)
+
+                .toList();
     }
 
 
 
-    // Buscar documento por ID
-    public Documento buscarPorId(Long id) {
 
-        return documentoRepository.findById(id)
+    // Buscar por ID
+
+    public DocumentoDTO buscarPorId(Long id) {
+
+
+        Documento documento =
+                documentoRepository.findById(id)
+
                 .orElseThrow(() ->
-                        new RuntimeException("Documento não encontrado!")
-                );
+                        new RuntimeException(
+                                "Documento não encontrado!"
+                        ));
+
+
+
+        return converterDTO(documento);
     }
 
 
-
-    // Atualizar documento
-    public Documento atualizarDocumento(
-            Long id,
-            MultipartFile arquivo
-    ) throws IOException {
-
-
-        Documento documento = buscarPorId(id);
-
-
-        if (arquivo != null && !arquivo.isEmpty()) {
-
-
-            Path diretorio = Paths.get(pastaUpload);
-
-            if (!Files.exists(diretorio)) {
-                Files.createDirectories(diretorio);
-            }
-
-
-            String nomeArquivo =
-                    UUID.randomUUID()
-                    + "_"
-                    + arquivo.getOriginalFilename();
-
-
-            Path caminhoArquivo =
-                    diretorio.resolve(nomeArquivo);
-
-
-            Files.write(
-                    caminhoArquivo,
-                    arquivo.getBytes()
-            );
-
-
-            documento.setCaminho(
-                    caminhoArquivo.toString()
-            );
-
-
-            documento.setNome(
-                    arquivo.getOriginalFilename()
-            );
-
-
-            documento.setTipo(
-                    arquivo.getContentType()
-            );
-
-
-            documento.setTamanho(
-                    arquivo.getSize()
-            );
-        }
-
-
-        return documentoRepository.save(documento);
-    }
 
 
 
     // Excluir documento
-    public void excluirDocumento(Long id) {
 
-        Documento documento = buscarPorId(id);
+    public void excluirDocumento(Long id)
+            throws IOException {
+
+
+        Documento documento =
+                documentoRepository.findById(id)
+
+                .orElseThrow(() ->
+                        new RuntimeException(
+                                "Documento não encontrado!"
+                        ));
+
+
+
+        Path arquivo =
+                Paths.get(documento.getCaminho());
+
+
+
+        Files.deleteIfExists(arquivo);
+
+
 
         documentoRepository.delete(documento);
     }
+
+
+
+
+
+    private DocumentoDTO converterDTO(
+            Documento documento
+    ) {
+
+
+        return new DocumentoDTO(
+
+                documento.getId(),
+
+                documento.getNome(),
+
+                documento.getTipo(),
+
+                documento.getTamanho(),
+
+                documento.getCaminho()
+        );
+    }
+
 }

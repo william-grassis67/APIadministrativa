@@ -1,6 +1,6 @@
 package com.example.demo.dto;
 
-import com.example.demo.entity.Usuario;
+import com.example.demo.entity.Usuario.TipoUsuario;
 
 public class UsuarioDTO {
 
@@ -9,14 +9,30 @@ public class UsuarioDTO {
     private String email;
     private String endereco;
     private String cpf;
-    private String senha;
-    private Usuario.TipoUsuario tipo;
     private String numeroTelefone;
-
+    private String senha;
+    private TipoUsuario tipo;
 
     public UsuarioDTO() {
     }
 
+    public UsuarioDTO(
+            Integer id,
+            String nome,
+            String email,
+            String endereco,
+            String cpf,
+            String numeroTelefone,
+            TipoUsuario tipo
+    ) {
+        this.id = id;
+        this.nome = nome;
+        this.email = email;
+        this.endereco = endereco;
+        this.cpf = cpf;
+        this.numeroTelefone = numeroTelefone;
+        this.tipo = tipo;
+    }
 
     public UsuarioDTO(
             Integer id,
@@ -34,23 +50,25 @@ public class UsuarioDTO {
         this.numeroTelefone = numeroTelefone;
     }
 
-
     public UsuarioDTO(
             Integer id,
             String nome,
             String email,
             String endereco,
             String cpf,
-            Usuario.TipoUsuario tipo
+            String numeroTelefone,
+            String senha,
+            TipoUsuario tipo
     ) {
         this.id = id;
         this.nome = nome;
         this.email = email;
         this.endereco = endereco;
         this.cpf = cpf;
+        this.numeroTelefone = numeroTelefone;
+        this.senha = senha;
         this.tipo = tipo;
     }
-
 
     public Integer getId() {
         return id;
@@ -60,7 +78,6 @@ public class UsuarioDTO {
         this.id = id;
     }
 
-
     public String getNome() {
         return nome;
     }
@@ -68,7 +85,6 @@ public class UsuarioDTO {
     public void setNome(String nome) {
         this.nome = nome;
     }
-
 
     public String getEmail() {
         return email;
@@ -78,7 +94,6 @@ public class UsuarioDTO {
         this.email = email;
     }
 
-
     public String getEndereco() {
         return endereco;
     }
@@ -86,7 +101,6 @@ public class UsuarioDTO {
     public void setEndereco(String endereco) {
         this.endereco = endereco;
     }
-
 
     public String getCpf() {
         return cpf;
@@ -96,15 +110,13 @@ public class UsuarioDTO {
         this.cpf = cpf;
     }
 
-
-    public Usuario.TipoUsuario getTipo() {
-        return tipo;
+    public String getNumeroTelefone() {
+        return numeroTelefone;
     }
 
-    public void setTipo(Usuario.TipoUsuario tipo) {
-        this.tipo = tipo;
+    public void setNumeroTelefone(String numeroTelefone) {
+        this.numeroTelefone = numeroTelefone;
     }
-
 
     public String getSenha() {
         return senha;
@@ -114,12 +126,11 @@ public class UsuarioDTO {
         this.senha = senha;
     }
 
-
-    public String getNumeroTelefone() {
-        return numeroTelefone;
+    public TipoUsuario getTipo() {
+        return tipo;
     }
 
-    public void setNumeroTelefone(String numeroTelefone) {
-        this.numeroTelefone = numeroTelefone;
+    public void setTipo(TipoUsuario tipo) {
+        this.tipo = tipo;
     }
 }
