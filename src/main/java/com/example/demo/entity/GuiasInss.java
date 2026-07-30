@@ -3,7 +3,7 @@ package com.example.demo.entity;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.*;
 
@@ -15,45 +15,29 @@ public class GuiasInss {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-
     @Column(nullable = false)
     private String competencia;
 
-
     private LocalDate vencimento;
 
-
     private Double valor;
-
 
     @Column(nullable = false)
     private boolean pago = false;
 
-
     @Column(name = "data_pagamento")
     private LocalDateTime dataPagamento;
-
 
     @Column(length = 255)
     private String mensagemPagamento;
 
-
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "usuario_id", nullable = false)
-    @JsonIgnoreProperties({
-            "guias",
-            "senha"
-    })
+    @JsonIgnore
     private Usuario usuario;
 
-
-
-    // Construtor obrigatório do JPA
     public GuiasInss() {
-
     }
-
-
 
     public GuiasInss(
             Integer id,
@@ -75,89 +59,65 @@ public class GuiasInss {
         this.usuario = usuario;
     }
 
-
-
     public Integer getId() {
         return id;
     }
-
 
     public void setId(Integer id) {
         this.id = id;
     }
 
-
-
     public String getCompetencia() {
         return competencia;
     }
-
 
     public void setCompetencia(String competencia) {
         this.competencia = competencia;
     }
 
-
-
     public LocalDate getVencimento() {
         return vencimento;
     }
-
 
     public void setVencimento(LocalDate vencimento) {
         this.vencimento = vencimento;
     }
 
-
-
     public Double getValor() {
         return valor;
     }
-
 
     public void setValor(Double valor) {
         this.valor = valor;
     }
 
-
-
     public boolean isPago() {
         return pago;
     }
-
 
     public void setPago(boolean pago) {
         this.pago = pago;
     }
 
-
-
     public LocalDateTime getDataPagamento() {
         return dataPagamento;
     }
-
 
     public void setDataPagamento(LocalDateTime dataPagamento) {
         this.dataPagamento = dataPagamento;
     }
 
-
-
     public String getMensagemPagamento() {
         return mensagemPagamento;
     }
-
 
     public void setMensagemPagamento(String mensagemPagamento) {
         this.mensagemPagamento = mensagemPagamento;
     }
 
-
-
     public Usuario getUsuario() {
         return usuario;
     }
-
 
     public void setUsuario(Usuario usuario) {
         this.usuario = usuario;
