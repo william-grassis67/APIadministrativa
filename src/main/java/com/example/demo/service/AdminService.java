@@ -154,7 +154,6 @@ public class AdminService {
         return mapToUsuarioDTO(usuario);
     }
 
-    // LISTAR PAGAMENTOS/GUIAS
     // LISTAR PAGAMENTOS / GUIAS
     @Transactional(readOnly = true)
     public List<GuiaInssDTO> listarPagamentos() {
@@ -177,8 +176,6 @@ public class AdminService {
         return mapToGuiaInssDTO(guia);
     }
 
-
-    // PEGAR GUIA DO USUÁRIO
     // PEGAR GUIAS DO USUÁRIO
     @Transactional(readOnly = true)
     public List<GuiaInssDTO> findByGuia(Integer usuarioId) {
@@ -191,7 +188,6 @@ public class AdminService {
                 .map(this::mapToGuiaInssDTO)
                 .collect(Collectors.toList());
     }
-
 
     // CRIAR PROCESSO
     public ProcessoDTO registrarProcesso(Processo processo, Integer usuarioId) {
@@ -253,7 +249,8 @@ public class AdminService {
                 u.getEndereco(),
                 u.getCpf(),
                 u.getNumeroTelefone(),
-                u.getTipo() // Adicionado o tipo do usuário (opcional, dependendo do seu UsuarioDTO)
+                u.getTipo(),
+                u.getUltimoAcesso() // ✅ Mapeamento do último acesso incluído corretamente!
         );
     }
 
@@ -274,7 +271,6 @@ public class AdminService {
             return null;
         }
 
-        // Converte o Double da entidade para BigDecimal para o DTO
         BigDecimal valorBigDecimal = (g.getValor() != null)
                 ? BigDecimal.valueOf(g.getValor())
                 : null;
@@ -282,9 +278,9 @@ public class AdminService {
         return new GuiaInssDTO(
                 g.getId(),
                 g.getCompetencia(),
-                g.getVencimento(), // Ou g.getDataVencimento()
+                g.getVencimento(),
                 valorBigDecimal,
-                g.isPago(),       // Ou g.getPago()
+                g.isPago(),
                 g.getUsuario() != null ? g.getUsuario().getId() : null,
                 g.getUsuario() != null ? g.getUsuario().getNome() : null
         );

@@ -1,15 +1,18 @@
 package com.example.demo.service;
 
+import java.time.LocalDateTime;
+
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.example.demo.dto.LoginDTO;
 import com.example.demo.entity.Usuario;
 import com.example.demo.exception.CampoInvalidoexception;
 import com.example.demo.repository.ClienteRepository;
 import com.example.demo.repository.GuiasInssRepository;
-import org.springframework.stereotype.Service;
-
-import java.time.LocalDateTime;
 
 @Service
+@Transactional
 public class LoginService {
 
     private final ClienteRepository clienteRepository;
@@ -28,48 +31,33 @@ public class LoginService {
 
     public LoginDTO login(String cpf, String senha) {
 
+        if (cpf == null || cpf.isBlank()) {
+            throw new CampoInvalidoexception("CPF é obrigatório!");
+        }
+
+        if (senha == null || senha.isBlank()) {
+            throw new CampoInvalidoexception("Senha é obrigatória!");
+        }
+
         final String cpfLimpo = cpf.replaceAll("\\D", "").trim();
 
-        System.out.println("====================================");
-        System.out.println("INÍCIO DO LOGIN");
-        System.out.println("CPF recebido: [" + cpfLimpo + "]");
-        System.out.println("Senha recebida: [" + senha + "]");
-        System.out.println("Quantidade de usuários: " + clienteRepository.count());
-
-        clienteRepository.findAll().forEach(u -> {
-            System.out.println(
-                    "ID: " + u.getId()
-                            + " | Nome: " + u.getNome()
-                            + " | CPF: [" + u.getCpf() + "]"
-            );
-        });
-
+        // 1. Busca usuário pelo CPF
         Usuario usuario = clienteRepository.findByCpf(cpfLimpo)
-                .orElseThrow(() -> {
-                    System.out.println("Nenhum usuário encontrado com o CPF: " + cpfLimpo);
-                    return new CampoInvalidoexception("CPF ou senha inválidos!");
-                });
+                .orElseThrow(() -> new CampoInvalidoexception("CPF ou senha inválidos!"));
 
-        System.out.println("Usuário encontrado: " + usuario.getNome());
-        System.out.println("CPF banco: [" + usuario.getCpf() + "]");
-        System.out.println("Senha banco: [" + usuario.getSenha() + "]");
-
+        // 2. Valida a senha
         if (usuario.getSenha() == null || !usuario.getSenha().equals(senha)) {
-
-            System.out.println("Senha incorreta!");
-
             throw new CampoInvalidoexception("CPF ou senha inválidos!");
         }
 
+        // 3. Atualiza e persiste a data do último acesso no banco de dados
+        usuario.setUltimoAcesso(LocalDateTime.now());
+        usuario = clienteRepository.save(usuario);
+
+        // 4. Gera o Token JWT
         String token = jwtService.gerarToken(usuario);
 
-        usuario.setUltimoAcesso(LocalDateTime.now());
-
-        clienteRepository.save(usuario);
-
-        System.out.println("Login realizado com sucesso!");
-        System.out.println("====================================");
-
+        // 5. Retorna o DTO preenchido
         return new LoginDTO(
                 usuario.getCpf(),
                 usuario.getNome(),

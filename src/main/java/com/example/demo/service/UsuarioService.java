@@ -119,23 +119,33 @@ public class UsuarioService {
     }
 
     // MAPPERS PRIVADOS
-    private GuiaInssDTO mapToGuiaInssDTO(GuiasInss g) {
-        if (g == null) {
+
+    private GuiaInssDTO mapToGuiaInssDTO(GuiasInss guia) {
+        if (guia == null) {
             return null;
         }
 
-        BigDecimal valorBigDecimal = (g.getValor() != null)
-                ? BigDecimal.valueOf(g.getValor())
-                : null;
+        BigDecimal valor = null;
+        if (guia.getValor() != null) {
+            valor = BigDecimal.valueOf(guia.getValor());
+        }
+
+        Integer usuarioId = null;
+        String nomeUsuario = null;
+
+        if (guia.getUsuario() != null) {
+            usuarioId = guia.getUsuario().getId();
+            nomeUsuario = guia.getUsuario().getNome();
+        }
 
         return new GuiaInssDTO(
-                g.getId(),
-                g.getCompetencia(),
-                g.getVencimento(),
-                valorBigDecimal,
-                g.isPago(),
-                g.getUsuario() != null ? g.getUsuario().getId() : null,
-                g.getUsuario() != null ? g.getUsuario().getNome() : null
+                guia.getId(),
+                guia.getCompetencia(),
+                guia.getVencimento(),
+                valor,
+                guia.isPago(),
+                usuarioId,
+                nomeUsuario
         );
     }
 
@@ -151,7 +161,8 @@ public class UsuarioService {
                 u.getEndereco(),
                 u.getCpf(),
                 u.getNumeroTelefone(),
-                u.getTipo()
+                u.getTipo(),
+                u.getUltimoAcesso() // Mapeamento incluído corretamente
         );
     }
 }
