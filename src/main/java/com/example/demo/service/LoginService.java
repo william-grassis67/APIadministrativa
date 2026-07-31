@@ -2,6 +2,7 @@ package com.example.demo.service;
 
 import java.time.LocalDateTime;
 
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,15 +19,18 @@ public class LoginService {
     private final ClienteRepository clienteRepository;
     private final JwtService jwtService;
     private final GuiasInssRepository guiasInssRepository;
+    private final PasswordEncoder passwordEncoder;
 
     public LoginService(
             ClienteRepository clienteRepository,
             JwtService jwtService,
-            GuiasInssRepository guiasInssRepository
+            GuiasInssRepository guiasInssRepository,
+            PasswordEncoder passwordEncoder
     ) {
         this.clienteRepository = clienteRepository;
         this.jwtService = jwtService;
         this.guiasInssRepository = guiasInssRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     public LoginDTO login(String cpf, String senha) {
@@ -45,8 +49,8 @@ public class LoginService {
         Usuario usuario = clienteRepository.findByCpf(cpfLimpo)
                 .orElseThrow(() -> new CampoInvalidoexception("CPF ou senha inválidos!"));
 
-        // 2. Valida a senha
-        if (usuario.getSenha() == null || !usuario.getSenha().equals(senha)) {
+        // 2. Valida a senha usando o PasswordEncoder (BCrypt)
+        if (usuario.getSenha() == null || !passwordEncoder.matches(senha, usuario.getSenha())) {
             throw new CampoInvalidoexception("CPF ou senha inválidos!");
         }
 
