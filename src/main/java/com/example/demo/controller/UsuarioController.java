@@ -7,6 +7,8 @@ import org.springframework.web.bind.annotation.*;
 
 import com.example.demo.dto.GuiaInssDTO;
 import com.example.demo.dto.ProcessoDTO;
+import com.example.demo.dto.ProcessoHistoricoDTO;
+import com.example.demo.dto.ProcessoMensagemDTO;
 import com.example.demo.service.ProcessoService;
 import com.example.demo.service.UsuarioService;
 
@@ -58,5 +60,15 @@ public class UsuarioController {
         List<GuiaInssDTO> guias = usuarioService.buscarGuiasPorUsuario(usuarioId);
 
         return ResponseEntity.ok(guias);
+    }
+
+    @GetMapping("/processos/{processoId}/historico")
+    public ResponseEntity<List<ProcessoHistoricoDTO>> buscarHistorico(@PathVariable Integer processoId) {
+        return ResponseEntity.ok(processoService.listarHistorico(processoId));
+    }
+
+    @GetMapping("/processos/{processoId}/mensagens")
+    public ResponseEntity<List<ProcessoMensagemDTO>> buscarMensagens(@PathVariable Integer processoId) {
+        return ResponseEntity.ok(processoService.listarMensagens(processoId));
     }
 }

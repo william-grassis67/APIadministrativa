@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -28,6 +29,11 @@ public class Processo {
     )
     private List<Documento> documentos;
 
+    @OneToMany(mappedBy = "processo", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ProcessoHistorico> historico = new ArrayList<>();
+
+    @OneToMany(mappedBy = "processo", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ProcessoMensagem> mensagens = new ArrayList<>();
 
     private String tipo;
 
@@ -68,8 +74,18 @@ public class Processo {
 
     private LocalDateTime dataConclusao;
 
+    @Column(name = "notificacoes_nao_lidas")
+    private Integer notificacoesNaoLidas = 0;
 
     public Processo() {
+    }
+
+    @PrePersist
+    @PreUpdate
+    private void normalizarNotificacoes() {
+        if (this.notificacoesNaoLidas == null) {
+            this.notificacoesNaoLidas = 0;
+        }
     }
 
 
@@ -99,6 +115,21 @@ public class Processo {
         this.documentos = documentos;
     }
 
+    public List<ProcessoHistorico> getHistorico() {
+        return historico;
+    }
+
+    public void setHistorico(List<ProcessoHistorico> historico) {
+        this.historico = historico;
+    }
+
+    public List<ProcessoMensagem> getMensagens() {
+        return mensagens;
+    }
+
+    public void setMensagens(List<ProcessoMensagem> mensagens) {
+        this.mensagens = mensagens;
+    }
 
     public String getTipo() {
         return tipo;
@@ -205,5 +236,13 @@ public class Processo {
 
     public void setDataConclusao(LocalDateTime dataConclusao) {
         this.dataConclusao = dataConclusao;
+    }
+
+    public Integer getNotificacoesNaoLidas() {
+        return notificacoesNaoLidas;
+    }
+
+    public void setNotificacoesNaoLidas(Integer notificacoesNaoLidas) {
+        this.notificacoesNaoLidas = notificacoesNaoLidas != null ? notificacoesNaoLidas : 0;
     }
 }
