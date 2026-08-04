@@ -196,6 +196,13 @@ public class AdminController {
         return ResponseEntity.noContent().build();
     }
 
+    @GetMapping("/processos/{processoId}/documentos")
+public ResponseEntity<List<DocumentoDTO>> listarDocumentosPorProcesso(
+        @PathVariable Integer processoId) {
+
+    return ResponseEntity.ok(documentoService.listarPorProcesso(processoId));
+}
+
     // ============================
     // GUIAS E PAGAMENTOS
     // ============================
