@@ -200,7 +200,7 @@ public class AdminController {
 public ResponseEntity<List<DocumentoDTO>> listarDocumentosPorProcesso(
         @PathVariable Integer processoId) {
 
-    return ResponseEntity.ok(documentoService.listarPorProcesso(processoId));
+    return ResponseEntity.ok(documentoService.listarDocumentosPorProcesso(processoId));
 }
 
     // ============================

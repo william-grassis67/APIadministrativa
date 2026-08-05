@@ -154,4 +154,21 @@ public class DocumentoService {
                 documento.getCaminho()
         );
     }
+
+    // LISTAR DOCUMENTOS POR PROCESSO
+@Transactional(readOnly = true)
+public List<DocumentoDTO> listarDocumentosPorProcesso(Integer processoId) {
+
+    if (processoId == null) {
+        throw new CampoInvalidoexception("ID do processo é obrigatório!");
+    }
+
+    Processo processo = processoRepository.findById(processoId)
+            .orElseThrow(() -> new CampoInvalidoexception("Processo não encontrado!"));
+
+    return documentoRepository.findByProcesso(processo)
+            .stream()
+            .map(this::converterDTO)
+            .toList();
+}
 }
