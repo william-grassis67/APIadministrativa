@@ -22,7 +22,7 @@ public class DocumentoService {
 
     private final DocumentoRepository documentoRepository;
     private final ProcessoRepository processoRepository;
-    private final String pastaUpload = "uploads";
+        private final String pastaUpload = "/tmp/uploads";
 
     public DocumentoService(
             DocumentoRepository documentoRepository,
